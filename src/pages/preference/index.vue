@@ -13,6 +13,7 @@ import { isMac } from '@/utils/platform'
 
 import About from './components/about/index.vue'
 import Cat from './components/cat/index.vue'
+import Chat from './components/chat/index.vue'
 import General from './components/general/index.vue'
 import Model from './components/model/index.vue'
 import Shortcut from './components/shortcut/index.vue'
@@ -47,6 +48,12 @@ const menus = computed(() => [
     label: t('pages.preference.model.title'),
     icon: 'i-solar:magic-stick-3-bold',
     component: Model,
+  },
+  {
+    key: 'chat',
+    label: t('pages.preference.chat.title'),
+    icon: 'i-solar:chat-round-dots-bold',
+    component: Chat,
   },
   {
     key: 'shortcut',

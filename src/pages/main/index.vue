@@ -18,7 +18,15 @@ import { useGamepad } from '@/composables/useGamepad'
 import { useModel } from '@/composables/useModel'
 import { useTauriListen } from '@/composables/useTauriListen'
 import { LISTEN_KEY } from '@/constants'
-import { hideWindow, setAlwaysOnTop, setTaskbarVisibility, showWindow } from '@/plugins/window'
+import {
+  hideChatWindow,
+  hideWindow,
+  repositionChatWindow,
+  setAlwaysOnTop,
+  setTaskbarVisibility,
+  showWindow,
+  toggleChatWindow,
+} from '@/plugins/window'
 import { useCatStore } from '@/stores/cat'
 import { useGeneralStore } from '@/stores/general.ts'
 import { useModelStore } from '@/stores/model'
@@ -38,10 +46,20 @@ const generalStore = useGeneralStore()
 const resizing = ref(false)
 const backgroundImagePath = ref<string>()
 const { stickActive } = useGamepad()
+let unlistenMoved: (() => void) | undefined
+const debouncedRepositionChat = useDebounceFn(repositionChatWindow, 120)
 
 onMounted(startListening)
 
+onMounted(async () => {
+  unlistenMoved = await appWindow.onMoved(debouncedRepositionChat)
+})
+
 onUnmounted(handleDestroy)
+
+onUnmounted(() => {
+  unlistenMoved?.()
+})
 
 const debouncedResize = useDebounceFn(async () => {
   await handleResize()
@@ -112,7 +130,12 @@ watch([modelStore.pressedKeys, stickActive], ([keys, stickActive]) => {
 }, { deep: true })
 
 watch(() => catStore.window.visible, async (value) => {
-  value ? showWindow() : hideWindow()
+  if (value) {
+    showWindow()
+  } else {
+    hideWindow()
+    hideChatWindow()
+  }
 })
 
 watch(() => catStore.window.passThrough, (value) => {
@@ -137,6 +160,16 @@ useTauriListen<number>(LISTEN_KEY.SET_EXPRESSION, ({ payload }) => {
 
 function handleMouseDown() {
   appWindow.startDragging()
+}
+
+async function handleDoubleClick() {
+  if (catStore.window.passThrough) return
+
+  try {
+    await toggleChatWindow()
+  } catch {
+    // The chat window may not be ready yet, ignore double-clicks.
+  }
 }
 
 async function handleContextmenu(event: MouseEvent) {
@@ -186,6 +219,7 @@ function handleMouseMove(event: MouseEvent) {
       borderRadius: `${catStore.window.radius}%`,
     }"
     @contextmenu="handleContextmenu"
+    @dblclick="handleDoubleClick"
     @mousedown="handleMouseDown"
     @mousemove="handleMouseMove"
   >

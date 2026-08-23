@@ -11,6 +11,10 @@ export type WindowLabel = typeof WINDOW_LABEL[keyof typeof WINDOW_LABEL]
 const COMMAND = {
   SHOW_WINDOW: 'plugin:custom-window|show_window',
   HIDE_WINDOW: 'plugin:custom-window|hide_window',
+  SHOW_CHAT_WINDOW: 'plugin:custom-window|show_chat_window_command',
+  HIDE_CHAT_WINDOW: 'plugin:custom-window|hide_chat_window',
+  TOGGLE_CHAT_WINDOW: 'plugin:custom-window|toggle_chat_window',
+  REPOSITION_CHAT_WINDOW: 'plugin:custom-window|reposition_chat_window',
   SET_ALWAYS_ON_TOP: 'plugin:custom-window|set_always_on_top',
   SET_TASKBAR_VISIBILITY: 'plugin:custom-window|set_taskbar_visibility',
 }
@@ -29,6 +33,22 @@ export function hideWindow(label?: WindowLabel) {
   } else {
     invoke(COMMAND.HIDE_WINDOW)
   }
+}
+
+export function showChatWindow() {
+  invoke(COMMAND.SHOW_CHAT_WINDOW)
+}
+
+export function hideChatWindow() {
+  invoke(COMMAND.HIDE_CHAT_WINDOW)
+}
+
+export async function toggleChatWindow() {
+  return invoke<boolean>(COMMAND.TOGGLE_CHAT_WINDOW)
+}
+
+export function repositionChatWindow() {
+  invoke(COMMAND.REPOSITION_CHAT_WINDOW)
 }
 
 export function setAlwaysOnTop(alwaysOnTop: boolean) {

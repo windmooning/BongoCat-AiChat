@@ -129,6 +129,54 @@
           "alwaysOnTop": "Toggle whether the cat window stays on top."
         }
       },
+      "chat": {
+        "title": "AI Chat",
+        "labels": {
+          "basicSettings": "Basic Settings",
+          "enableChat": "Enable AI Chat",
+          "endpoint": "Endpoint",
+          "apiKey": "API Key",
+          "model": "Model",
+          "testConnection": "Test Connection",
+          "replySettings": "Reply Settings",
+          "temperature": "Temperature",
+          "maxTokens": "Max Tokens",
+          "contextMessages": "Context Messages",
+          "replySuffix": "Reply Suffix",
+          "personaSettings": "Persona Settings",
+          "personaPreset": "Persona Preset",
+          "systemPrompt": "System Prompt",
+          "dataSettings": "Data Management",
+          "clearHistory": "Clear Chat History"
+        },
+        "hints": {
+          "endpoint": "An OpenAI-compatible endpoint. Most providers such as DeepSeek, Qwen, and Doubao work directly.",
+          "apiKey": "Stored locally in the app config file and never uploaded elsewhere.",
+          "model": "Must match the provider's model name exactly, for example gpt-4o-mini.",
+          "testSuccess": "Connection successful",
+          "testFailed": "Connection failed",
+          "temperature": "Higher values are more creative, lower values are more deterministic.",
+          "maxTokens": "Limits tokens per reply. Longer replies will be truncated.",
+          "contextMessages": "How many recent messages are sent with each request. Larger values use more tokens.",
+          "replySuffix": "Text appended to every finished reply, for example \"meow~\".",
+          "personaPreset": "Selecting a preset fills the system prompt and suffix, which can still be edited afterwards.",
+          "systemPrompt": "Defines the cat's personality, speaking style, and identity.",
+          "clearHistory": "This action cannot be undone.",
+          "clearSuccess": "Chat history cleared"
+        },
+        "options": {
+          "catgirl": "Cute Catgirl",
+          "cat": "Normal Cat",
+          "custom": "Custom"
+        },
+        "placeholders": {
+          "endpoint": "https://api.openai.com/v1/chat/completions",
+          "apiKey": "sk-...",
+          "model": "gpt-4o-mini",
+          "replySuffix": "meow~",
+          "systemPrompt": "Describe the cat's personality and reply style..."
+        }
+      },
       "about": {
         "title": "About",
         "labels": {
@@ -147,6 +195,29 @@
           "feedbackIssues": "Feedback Issues",
           "viewLog": "View Logs"
         }
+      }
+    },
+    "chat": {
+      "title": "Cat Chat",
+      "labels": {
+        "clearHistory": "Clear History",
+        "goSettings": "Open Settings",
+        "inputPlaceholder": "Say something to the cat... (Enter to send)"
+      },
+      "hints": {
+        "emptyChat": "Double-click the cat to open this bubble and start chatting~",
+        "setupFirst": "No LLM API has been configured yet. Open settings to get started.",
+        "clearHistory": "Clear all chat history?"
+      },
+      "errors": {
+        "disabled": "AI chat is disabled in settings",
+        "notConfigured": "Fill in the endpoint and model name in settings first",
+        "unknown": "An unknown error occurred. Please try again later."
+      },
+      "messages": {
+        "emptyReply": "The cat tilted its head and said nothing.",
+        "stopped": "(stopped)",
+        "thinking": "Thinking..."
       }
     }
   },

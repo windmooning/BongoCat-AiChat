@@ -129,6 +129,54 @@
           "alwaysOnTop": "切换猫咪窗口是否置顶。"
         }
       },
+      "chat": {
+        "title": "AI 对话",
+        "labels": {
+          "basicSettings": "基础配置",
+          "enableChat": "启用 AI 对话",
+          "endpoint": "接口地址",
+          "apiKey": "API Key",
+          "model": "模型名称",
+          "testConnection": "测试连接",
+          "replySettings": "回复参数",
+          "temperature": "回复随机性",
+          "maxTokens": "最大回复长度",
+          "contextMessages": "上下文条数",
+          "replySuffix": "回复后缀",
+          "personaSettings": "人格设置",
+          "personaPreset": "人格预设",
+          "systemPrompt": "系统提示词",
+          "dataSettings": "数据管理",
+          "clearHistory": "清空对话历史"
+        },
+        "hints": {
+          "endpoint": "OpenAI 兼容接口地址，DeepSeek、通义、豆包等大多数服务都可以直接填写。",
+          "apiKey": "保存在本机应用配置文件中，不会上传到其他服务器。",
+          "model": "需要与服务商提供的模型名完全一致，例如 gpt-4o-mini。",
+          "testSuccess": "连接成功",
+          "testFailed": "连接失败",
+          "temperature": "数值越高回复越有创意，越低回复越稳定。",
+          "maxTokens": "限制单次回复的 token 数量，超出部分会被截断。",
+          "contextMessages": "发送请求时携带的最近对话条数，越大越消耗 token。",
+          "replySuffix": "每次回复结束后自动追加的内容，例如「喵~」。",
+          "personaPreset": "切换预设会自动填充系统提示词和后缀，之后仍可手动修改。",
+          "systemPrompt": "定义猫咪的性格、说话方式和身份设定。",
+          "clearHistory": "删除后无法恢复。",
+          "clearSuccess": "对话历史已清空"
+        },
+        "options": {
+          "catgirl": "可爱猫娘",
+          "cat": "普通猫咪",
+          "custom": "自定义"
+        },
+        "placeholders": {
+          "endpoint": "https://api.openai.com/v1/chat/completions",
+          "apiKey": "sk-...",
+          "model": "gpt-4o-mini",
+          "replySuffix": "喵~",
+          "systemPrompt": "描述猫咪的性格和回复风格..."
+        }
+      },
       "about": {
         "title": "关于",
         "labels": {
@@ -147,6 +195,29 @@
           "feedbackIssues": "反馈问题",
           "viewLog": "查看日志"
         }
+      }
+    },
+    "chat": {
+      "title": "猫咪聊天",
+      "labels": {
+        "clearHistory": "清空历史",
+        "goSettings": "去设置",
+        "inputPlaceholder": "和猫咪说点什么...（Enter 发送）"
+      },
+      "hints": {
+        "emptyChat": "双击猫咪就能打开这里，试试和它聊天吧~",
+        "setupFirst": "还没有配置大模型 API，先去设置一下吧",
+        "clearHistory": "确定要清空全部对话历史吗？"
+      },
+      "errors": {
+        "disabled": "AI 对话已在设置中关闭",
+        "notConfigured": "请先在设置中填写接口地址和模型名称",
+        "unknown": "发生未知错误，请稍后重试"
+      },
+      "messages": {
+        "emptyReply": "猫咪歪了歪头，什么都没说。",
+        "stopped": "（已停止生成）",
+        "thinking": "正在思考..."
       }
     }
   },

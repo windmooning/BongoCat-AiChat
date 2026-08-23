@@ -15,6 +15,8 @@ const COMMAND = {
   HIDE_CHAT_WINDOW: 'plugin:custom-window|hide_chat_window',
   TOGGLE_CHAT_WINDOW: 'plugin:custom-window|toggle_chat_window',
   REPOSITION_CHAT_WINDOW: 'plugin:custom-window|reposition_chat_window',
+  SHOW_CAT_BUBBLE: 'plugin:custom-window|show_cat_bubble_window_command',
+  HIDE_CAT_BUBBLE: 'plugin:custom-window|hide_cat_bubble_window',
   SET_ALWAYS_ON_TOP: 'plugin:custom-window|set_always_on_top',
   SET_TASKBAR_VISIBILITY: 'plugin:custom-window|set_taskbar_visibility',
 }
@@ -49,6 +51,14 @@ export async function toggleChatWindow(followCat = true) {
 
 export function repositionChatWindow() {
   invoke(COMMAND.REPOSITION_CHAT_WINDOW)
+}
+
+export function showCatBubbleWindow() {
+  invoke(COMMAND.SHOW_CAT_BUBBLE)
+}
+
+export function hideCatBubbleWindow() {
+  invoke(COMMAND.HIDE_CAT_BUBBLE)
 }
 
 export function setAlwaysOnTop(alwaysOnTop: boolean) {

@@ -15,6 +15,21 @@
           "mirrorMode": "Mirror Mode",
           "mouseMirror": "Mouse Mirror",
           "ignoreMouse": "Ignore Mouse Events",
+          "hoverBubbleDelay": "Hover Bubble Delay",
+          "bubbleAppearance": "Bubble Appearance",
+          "bubbleWidth": "Bubble Width",
+          "bubbleHeight": "Bubble Height",
+          "bubbleBackgroundColor": "Background Color",
+          "bubbleOpacity": "Background Opacity",
+          "bubbleFontSize": "Text Size",
+          "bubbleRadius": "Bubble Radius",
+          "bubbleShadow": "Bubble Shadow",
+          "bubblePhrases": "Bubble Phrases",
+          "bubbleIdleMorning": "Morning Mood",
+          "bubbleIdleAfternoon": "Afternoon Mood",
+          "bubbleIdleNight": "Night Mood",
+          "bubbleBored": "Bored Reminder",
+          "bubbleSleepy": "Sleepy Reminder",
           "windowSettings": "Window Settings",
           "passThrough": "Pass Through",
           "alwaysOnTop": "Always on Top",
@@ -32,6 +47,13 @@
           "mirrorMode": "When enabled, the model will be mirrored horizontally.",
           "mouseMirror": "When enabled, the mouse will mirror the hand movement.",
           "ignoreMouse": "When enabled, the model will not respond to mouse events. Useful for keyboard mode or gamepad mode.",
+          "hoverBubbleDelay": "How long the mouse must stay on the cat before the cloud bubble appears.",
+          "bubbleBackgroundColor": "Accepts hex colors. White is the default.",
+          "bubbleOpacity": "Only the background becomes transparent; text stays readable.",
+          "bubbleFontSize": "Changes the text size inside the bubble.",
+          "bubbleRadius": "Changes the bubble corner radius.",
+          "bubbleShadow": "Removes the bubble shadow when disabled.",
+          "customPhrases": "One phrase per line. Leave empty to use built-in phrases.",
           "motionSound": "When enabled, the model will play corresponding sound effects when performing actions (if they exist).",
           "behavior": "When enabled, motions and expressions can be configured and triggered.",
           "passThrough": "When enabled, clicks pass through the window without affecting it.",
@@ -144,6 +166,7 @@
           "contextMessages": "Context Messages",
           "replySuffix": "Reply Suffix",
           "personaSettings": "Persona Settings",
+          "catName": "Cat Name",
           "personaPreset": "Persona Preset",
           "systemPrompt": "System Prompt",
           "appearanceSettings": "Appearance Settings",
@@ -167,6 +190,7 @@
           "maxTokens": "Limits tokens per reply. Longer replies will be truncated.",
           "contextMessages": "How many recent messages are sent with each request. Larger values use more tokens.",
           "replySuffix": "Text appended to every finished reply, for example \"meow~\".",
+          "catName": "The cat's name shown in the chat bubble header.",
           "personaPreset": "Selecting a preset fills the system prompt and suffix, which can still be edited afterwards.",
           "systemPrompt": "Defines the cat's personality, speaking style, and identity.",
           "followCat": "When enabled, the bubble stays next to the cat; when disabled, it uses your custom position.",
@@ -185,6 +209,7 @@
           "endpoint": "https://api.openai.com/v1/chat/completions",
           "apiKey": "sk-...",
           "model": "gpt-4o-mini",
+          "catName": "Kitten",
           "replySuffix": "meow~",
           "systemPrompt": "Describe the cat's personality and reply style..."
         }
@@ -221,6 +246,19 @@
         "setupFirst": "No LLM API has been configured yet. Open settings to get started.",
         "clearHistory": "Clear all chat history?"
       },
+      "empty": {
+        "title": "What shall we talk about today, master?",
+        "hint": "Try saying something to me, meow~"
+      },
+      "status": {
+        "error": "I didn't quite catch that...",
+        "unconfigured": "I'm not set up yet. Right-click me to open settings~",
+        "thinking": "Thinking about how to reply...",
+        "replying": "Replying to you~",
+        "idleMorning": "I'm in a good mood today, meow~",
+        "idleAfternoon": "Staying by your side",
+        "idleNight": "A little sleepy..."
+      },
       "errors": {
         "disabled": "AI chat is disabled in settings",
         "notConfigured": "Fill in the endpoint and model name in settings first",
@@ -230,6 +268,32 @@
         "emptyReply": "The cat tilted its head and said nothing.",
         "stopped": "(stopped)",
         "thinking": "Thinking..."
+      }
+    },
+    "catBubble": {
+      "idle": {
+        "morning1": "I'm in a good mood today, meow~",
+        "morning2": "Good morning, master! Let's be full of energy today!",
+        "morning3": "Morning, meow~ I want a hug from master.",
+        "afternoon1": "Staying by your side. Call me if you need me~",
+        "afternoon2": "Good afternoon. I want to play with you.",
+        "afternoon3": "I was just missing you...",
+        "night1": "It's dark now. I'm a little sleepy~",
+        "night2": "Talk to me a little before you sleep, master~",
+        "night3": "The night is quiet. I'll keep watch over you."
+      },
+      "hints": {
+        "chat": "Click me to chat with master~",
+        "touch": "You can pet me too, meow~",
+        "stay": "I'll stay quietly by your side~"
+      },
+      "proactive": {
+        "bored1": "Master, what are you doing? I'm a little bored~",
+        "bored2": "I wish master would notice me...",
+        "bored3": "Play with me for a bit, master~",
+        "sleepy1": "I'm a little sleepy~",
+        "sleepy2": "It's late. I want to curl up next to master and sleep...",
+        "sleepy3": "My eyes are heavy. I'll wait for master to rest together~"
       }
     }
   },

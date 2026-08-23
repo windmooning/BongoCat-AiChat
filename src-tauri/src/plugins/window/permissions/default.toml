@@ -9,6 +9,8 @@ permissions = [
     "allow-hide-chat-window",
     "allow-toggle-chat-window",
     "allow-reposition-chat-window",
+    "allow-show-cat-bubble-window-command",
+    "allow-hide-cat-bubble-window",
     "allow-set-always-on-top",
     "allow-set-taskbar-visibility",
 ]

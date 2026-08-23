@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Divider, Flex, InputNumber, Slider, SpaceAddon, SpaceCompact, Switch } from 'antdv-next'
+import { ColorPicker, Divider, Flex, Input, InputNumber, Slider, SpaceAddon, SpaceCompact, Switch } from 'antdv-next'
 
 import ProListItem from '@/components/pro-list-item/index.vue'
 import ProList from '@/components/pro-list/index.vue'
@@ -30,6 +30,23 @@ const catStore = useCatStore()
       :title="$t('pages.preference.cat.labels.ignoreMouse')"
     >
       <Switch v-model:checked="catStore.model.ignoreMouse" />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.hoverBubbleDelay')"
+      :title="$t('pages.preference.cat.labels.hoverBubbleDelay')"
+    >
+      <SpaceCompact>
+        <InputNumber
+          v-model:value="catStore.window.hoverBubbleDelay"
+          class="w-20"
+          :max="5000"
+          :min="500"
+          :step="100"
+        />
+
+        <SpaceAddon>ms</SpaceAddon>
+      </SpaceCompact>
     </ProListItem>
 
     <ProListItem
@@ -69,6 +86,146 @@ const catStore = useCatStore()
         v-model:value="catStore.model.maxFPS"
         class="w-20"
         :min="0"
+      />
+    </ProListItem>
+  </ProList>
+
+  <ProList :title="$t('pages.preference.cat.labels.bubbleAppearance')">
+    <ProListItem :title="$t('pages.preference.cat.labels.bubbleWidth')">
+      <InputNumber
+        v-model:value="catStore.bubble.appearance.width"
+        class="w-24"
+        :max="360"
+        :min="180"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.cat.labels.bubbleHeight')">
+      <InputNumber
+        v-model:value="catStore.bubble.appearance.height"
+        class="w-24"
+        :max="180"
+        :min="72"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.cat.labels.bubbleBackgroundColor')">
+      <div class="flex items-center gap-3">
+        <ColorPicker
+          v-model:value="catStore.bubble.appearance.backgroundColor"
+          :disabled-alpha="true"
+          format="hex"
+        />
+
+        <Input
+          v-model:value="catStore.bubble.appearance.backgroundColor"
+          class="w-30"
+        />
+      </div>
+    </ProListItem>
+
+    <ProListItem
+      :title="$t('pages.preference.cat.labels.bubbleOpacity')"
+      vertical
+    >
+      <Slider
+        v-model:value="catStore.bubble.appearance.backgroundOpacity"
+        class="m-0!"
+        :max="100"
+        :min="0"
+        :tooltip="{
+          formatter(value) {
+            return `${value}%`
+          },
+        }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :title="$t('pages.preference.cat.labels.bubbleFontSize')"
+      vertical
+    >
+      <Slider
+        v-model:value="catStore.bubble.appearance.fontSize"
+        class="m-0!"
+        :max="18"
+        :min="10"
+        :step="1"
+        :tooltip="{
+          formatter(value) {
+            return `${value}px`
+          },
+        }"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.cat.labels.bubbleRadius')">
+      <InputNumber
+        v-model:value="catStore.bubble.appearance.borderRadius"
+        class="w-24"
+        :max="28"
+        :min="12"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.cat.labels.bubbleShadow')">
+      <Switch v-model:checked="catStore.bubble.appearance.shadow" />
+    </ProListItem>
+  </ProList>
+
+  <ProList :title="$t('pages.preference.cat.labels.bubblePhrases')">
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.customPhrases')"
+      :title="$t('pages.preference.cat.labels.bubbleIdleMorning')"
+      vertical
+    >
+      <Input.TextArea
+        v-model:value="catStore.bubble.customPhrases.idleMorning"
+        :auto-size="{ minRows: 2, maxRows: 4 }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.customPhrases')"
+      :title="$t('pages.preference.cat.labels.bubbleIdleAfternoon')"
+      vertical
+    >
+      <Input.TextArea
+        v-model:value="catStore.bubble.customPhrases.idleAfternoon"
+        :auto-size="{ minRows: 2, maxRows: 4 }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.customPhrases')"
+      :title="$t('pages.preference.cat.labels.bubbleIdleNight')"
+      vertical
+    >
+      <Input.TextArea
+        v-model:value="catStore.bubble.customPhrases.idleNight"
+        :auto-size="{ minRows: 2, maxRows: 4 }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.customPhrases')"
+      :title="$t('pages.preference.cat.labels.bubbleBored')"
+      vertical
+    >
+      <Input.TextArea
+        v-model:value="catStore.bubble.customPhrases.bored"
+        :auto-size="{ minRows: 2, maxRows: 4 }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.cat.hints.customPhrases')"
+      :title="$t('pages.preference.cat.labels.bubbleSleepy')"
+      vertical
+    >
+      <Input.TextArea
+        v-model:value="catStore.bubble.customPhrases.sleepy"
+        :auto-size="{ minRows: 2, maxRows: 4 }"
       />
     </ProListItem>
   </ProList>

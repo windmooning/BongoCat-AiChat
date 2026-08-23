@@ -13,6 +13,7 @@ import { nth } from 'es-toolkit/compat'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { useAppMenu } from '@/composables/useAppMenu'
+import { useCatBubble } from '@/composables/useCatBubble'
 import { useDevice } from '@/composables/useDevice'
 import { useGamepad } from '@/composables/useGamepad'
 import { useModel } from '@/composables/useModel'
@@ -45,6 +46,7 @@ const { getBaseMenu, getExitMenu } = useAppMenu()
 const modelStore = useModelStore()
 const generalStore = useGeneralStore()
 const chatStore = useChatStore()
+const { markInteraction } = useCatBubble()
 const resizing = ref(false)
 const backgroundImagePath = ref<string>()
 const { stickActive } = useGamepad()
@@ -171,6 +173,8 @@ useTauriListen<number>(LISTEN_KEY.SET_EXPRESSION, ({ payload }) => {
 function handleMouseDown(event: MouseEvent) {
   if (event.button !== 0) return
 
+  markInteraction()
+
   const now = Date.now()
   const distance = Math.abs(event.clientX - lastLeftDownPosition.x)
     + Math.abs(event.clientY - lastLeftDownPosition.y)
@@ -203,6 +207,8 @@ function handleMouseUp() {
 
 async function handleContextmenu(event: MouseEvent) {
   event.preventDefault()
+
+  markInteraction()
 
   if (event.shiftKey) return
 

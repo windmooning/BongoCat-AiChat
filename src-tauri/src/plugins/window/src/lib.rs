@@ -16,6 +16,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::hide_chat_window,
             commands::toggle_chat_window,
             commands::reposition_chat_window,
+            commands::show_cat_bubble_window_command,
+            commands::hide_cat_bubble_window,
             commands::set_always_on_top,
             commands::set_taskbar_visibility,
         ])

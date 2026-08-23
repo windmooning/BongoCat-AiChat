@@ -24,6 +24,7 @@ export interface ChatAppearance {
 
 export interface ChatConfig {
   enabled: boolean
+  catName: string
   endpoint: string
   apiKey: string
   model: string
@@ -64,6 +65,7 @@ const DEFAULT_APPEARANCE: ChatAppearance = {
 export const useChatStore = defineStore('chat', () => {
   const config = reactive<ChatConfig>({
     enabled: true,
+    catName: '小猫',
     endpoint: 'https://api.openai.com/v1/chat/completions',
     apiKey: '',
     model: '',
@@ -112,6 +114,8 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   const init = () => {
+    config.catName ||= '小猫'
+
     config.appearance = {
       ...DEFAULT_APPEARANCE,
       ...config.appearance,

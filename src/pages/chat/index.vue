@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { LogicalSize } from '@tauri-apps/api/dpi'
+import { emit } from '@tauri-apps/api/event'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { Button, Input, Popconfirm } from 'antdv-next'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { WINDOW_LABEL } from '@/constants'
-import { hideChatWindow, showWindow } from '@/plugins/window'
+import { useChatStatus } from '@/composables/useChatStatus'
+import { LISTEN_KEY } from '@/constants'
+import { hideChatWindow } from '@/plugins/window'
 import { useChatStore } from '@/stores/chat'
+import { useModelStore } from '@/stores/model'
 import { ChatApiError, streamChatCompletion } from '@/utils/llm'
+import { join } from '@/utils/path'
 
 const chatStore = useChatStore()
+const modelStore = useModelStore()
 const appWindow = getCurrentWebviewWindow()
 const { t } = useI18n()
 
@@ -21,6 +27,7 @@ const streamingContent = ref('')
 const streamingMessageId = ref<string>()
 const abortController = ref<AbortController>()
 const messagesRef = ref<HTMLElement>()
+const avatarFailed = ref(false)
 let draggingChatWindow = false
 let unlistenMoved: (() => void) | undefined
 
@@ -88,6 +95,25 @@ const cardStyle = computed(() => {
 
 const isConfigured = computed(() => chatStore.isConfigured())
 
+const catAvatarSrc = computed(() => {
+  const currentModel = modelStore.currentModel
+
+  if (avatarFailed.value || !currentModel) return '/logo.png'
+
+  return convertFileSrc(join(currentModel.path, 'resources', 'cover.png'))
+})
+
+const { statusKey } = useChatStatus({
+  isStreaming,
+  streamingContent,
+  errorText,
+  isConfigured,
+})
+
+watch(() => statusKey.value, (value) => {
+  emit(LISTEN_KEY.CHAT_STATUS, value)
+}, { immediate: true })
+
 const canSend = computed(() => {
   return !isStreaming.value && input.value.trim().length > 0
 })
@@ -119,8 +145,8 @@ function handleClose() {
   }
 }
 
-function openPreference() {
-  showWindow(WINDOW_LABEL.PREFERENCE)
+function handleAvatarError() {
+  avatarFailed.value = true
 }
 
 async function handleSend() {
@@ -281,26 +307,36 @@ onUnmounted(() => {
       class="h-full flex flex-col overflow-hidden b-1 b-solid bg-elevated b-border-sec rounded-2xl shadow-lg"
       :style="cardStyle"
     >
-      <div class="flex items-center justify-between border-b border-solid px-3 py-2 b-border-sec">
+      <div class="flex items-center justify-between gap-2 border-b border-solid px-3 py-1.5 b-border-sec">
         <div
-          class="flex cursor-move select-none items-center gap-2"
+          class="min-w-0 flex flex-1 cursor-move select-none items-center gap-2"
           @mousedown="handleDragStart"
           @mouseup="handleDragEnd"
         >
           <img
-            class="size-7 rounded-full"
-            src="/logo.png"
+            class="size-8 shrink-0 object-cover rounded-full"
+            :src="catAvatarSrc"
+            @error="handleAvatarError"
           >
 
-          <span
-            class="font-medium"
-            :style="{ color: contentColor }"
-          >
-            {{ $t('pages.chat.title') }}
-          </span>
+          <div class="min-w-0">
+            <div
+              class="truncate text-3.5 font-medium"
+              :style="{ color: contentColor }"
+            >
+              {{ chatStore.config.catName }}
+            </div>
+
+            <div
+              class="truncate text-2.5 color-text-tertiary"
+              :style="{ color: contentColor }"
+            >
+              {{ $t(statusKey) }}
+            </div>
+          </div>
         </div>
 
-        <div class="flex items-center gap-1">
+        <div class="flex shrink-0 items-center gap-1">
           <Popconfirm
             :description="$t('pages.chat.hints.clearHistory')"
             placement="bottomRight"
@@ -331,34 +367,37 @@ onUnmounted(() => {
       >
         <div
           v-if="displayMessages.length === 0"
-          class="h-full flex flex-col items-center justify-center gap-3 text-center color-text-tertiary"
+          class="h-full flex flex-col items-center justify-center gap-3 text-center"
           :style="{ color: contentColor, fontSize: 'var(--chat-font-size)' }"
         >
           <img
-            class="size-14 opacity-60 rounded-full"
-            src="/logo.png"
+            class="chat-cat-float size-18 object-cover rounded-3xl"
+            :src="catAvatarSrc"
+            @error="handleAvatarError"
           >
 
-          <div class="text-3">
-            {{ isConfigured ? $t('pages.chat.hints.emptyChat') : $t('pages.chat.hints.setupFirst') }}
+          <div class="font-medium">
+            {{ $t('pages.chat.empty.title') }}
           </div>
 
-          <Button
-            v-if="!isConfigured"
-            size="small"
-            type="primary"
-            @click="openPreference"
-          >
-            {{ $t('pages.chat.labels.goSettings') }}
-          </Button>
+          <div class="text-3 opacity-70">
+            {{ $t('pages.chat.empty.hint') }}
+          </div>
         </div>
 
         <div
           v-for="message in displayMessages"
           :key="message.id"
-          class="mb-3 flex"
+          class="mb-3 flex items-end gap-2"
           :class="[message.role === 'user' ? 'justify-end' : 'justify-start']"
         >
+          <img
+            v-if="message.role === 'assistant'"
+            class="size-6 shrink-0 object-cover rounded-full"
+            :src="catAvatarSrc"
+            @error="handleAvatarError"
+          >
+
           <div
             class="max-w-[85%] break-words px-3 py-2 text-3.5 leading-6 rounded-xl"
             :class="message.role === 'user'
@@ -426,3 +465,26 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.chat-cat-float {
+  animation: chat-cat-float 3s ease-in-out infinite;
+}
+
+@keyframes chat-cat-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-cat-float {
+    animation: none;
+  }
+}
+</style>

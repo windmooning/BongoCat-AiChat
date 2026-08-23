@@ -15,6 +15,21 @@
           "mirrorMode": "镜像模式",
           "mouseMirror": "鼠标镜像",
           "ignoreMouse": "忽略鼠标事件",
+          "hoverBubbleDelay": "悬停提示延迟",
+          "bubbleAppearance": "悬浮气泡外观",
+          "bubbleWidth": "气泡宽度",
+          "bubbleHeight": "气泡高度",
+          "bubbleBackgroundColor": "背景颜色",
+          "bubbleOpacity": "背景不透明度",
+          "bubbleFontSize": "文字大小",
+          "bubbleRadius": "气泡圆角",
+          "bubbleShadow": "气泡阴影",
+          "bubblePhrases": "气泡文案",
+          "bubbleIdleMorning": "上午心情",
+          "bubbleIdleAfternoon": "下午心情",
+          "bubbleIdleNight": "夜间心情",
+          "bubbleBored": "无聊提醒",
+          "bubbleSleepy": "困倦提醒",
           "windowSettings": "窗口设置",
           "passThrough": "窗口穿透",
           "alwaysOnTop": "窗口置顶",
@@ -32,6 +47,13 @@
           "mirrorMode": "启用后，模型将水平镜像翻转。",
           "mouseMirror": "启用后，鼠标将镜像跟随手部移动。",
           "ignoreMouse": "启用后，模型将不再响应鼠标事件，适用于键盘模式或手柄模式。",
+          "hoverBubbleDelay": "鼠标停留在猫咪身上多久后显示头顶云朵气泡。",
+          "bubbleBackgroundColor": "支持十六进制颜色，默认是白色。",
+          "bubbleOpacity": "只调整背景透明度，文字保持清晰。",
+          "bubbleFontSize": "调整气泡内文字大小。",
+          "bubbleRadius": "调整气泡圆角大小。",
+          "bubbleShadow": "关闭后移除气泡阴影。",
+          "customPhrases": "每行一句，留空使用内置文案。",
           "motionSound": "启用后，模型执行动作时会播放对应音效（如果存在）。",
           "behavior": "启用后，可以配置和触发模型的动作与表情。",
           "passThrough": "启用后，窗口不影响对其他应用程序的操作。",
@@ -144,6 +166,7 @@
           "contextMessages": "上下文条数",
           "replySuffix": "回复后缀",
           "personaSettings": "人格设置",
+          "catName": "猫咪名称",
           "personaPreset": "人格预设",
           "systemPrompt": "系统提示词",
           "appearanceSettings": "外观设置",
@@ -167,6 +190,7 @@
           "maxTokens": "限制单次回复的 token 数量，超出部分会被截断。",
           "contextMessages": "发送请求时携带的最近对话条数，越大越消耗 token。",
           "replySuffix": "每次回复结束后自动追加的内容，例如「喵~」。",
+          "catName": "显示在聊天气泡标题栏的猫咪名称。",
           "personaPreset": "切换预设会自动填充系统提示词和后缀，之后仍可手动修改。",
           "systemPrompt": "定义猫咪的性格、说话方式和身份设定。",
           "followCat": "开启后气泡会贴到猫咪旁边并跟随移动；关闭后使用你拖动的位置。",
@@ -185,6 +209,7 @@
           "endpoint": "https://api.openai.com/v1/chat/completions",
           "apiKey": "sk-...",
           "model": "gpt-4o-mini",
+          "catName": "小猫",
           "replySuffix": "喵~",
           "systemPrompt": "描述猫咪的性格和回复风格..."
         }
@@ -221,6 +246,19 @@
         "setupFirst": "还没有配置大模型 API，先去设置一下吧",
         "clearHistory": "确定要清空全部对话历史吗？"
       },
+      "empty": {
+        "title": "主人今天想和我聊点什么呢？",
+        "hint": "试着和我说句话吧喵～"
+      },
+      "status": {
+        "error": "刚刚好像没听清……",
+        "unconfigured": "主人还没设置好，右键猫咪打开设置吧～",
+        "thinking": "正在想怎么回答……",
+        "replying": "正在回答主人～",
+        "idleMorning": "今天心情不错喵～",
+        "idleAfternoon": "正在陪着主人",
+        "idleNight": "有点困困的……"
+      },
       "errors": {
         "disabled": "AI 对话已在设置中关闭",
         "notConfigured": "请先在设置中填写接口地址和模型名称",
@@ -230,6 +268,32 @@
         "emptyReply": "猫咪歪了歪头，什么都没说。",
         "stopped": "（已停止生成）",
         "thinking": "正在思考..."
+      }
+    },
+    "catBubble": {
+      "idle": {
+        "morning1": "今天心情不错喵～",
+        "morning2": "早呀主人，今天也要元气满满喵！",
+        "morning3": "早安喵，想要主人抱抱～",
+        "afternoon1": "正在陪着主人，有事喊我喵～",
+        "afternoon2": "下午好呀，想和主人一起玩。",
+        "afternoon3": "有点想主人了呢……",
+        "night1": "天黑了，咪有点困困的～",
+        "night2": "主人晚安前陪我说说话嘛～",
+        "night3": "夜晚好安静，咪在守着主人哦。"
+      },
+      "hints": {
+        "chat": "点我就可以和主人聊天哦～",
+        "touch": "摸摸我也行喵～",
+        "stay": "我会乖乖陪在主人身边～"
+      },
+      "proactive": {
+        "bored1": "主人你在干嘛呀？咪有点无聊～",
+        "bored2": "好想主人理理我……",
+        "bored3": "主人陪咪玩一会儿嘛～",
+        "sleepy1": "咪有点困困的～",
+        "sleepy2": "夜深了，咪想窝在主人身边睡觉……",
+        "sleepy3": "咪的眼皮好重，等主人一起休息喵……"
       }
     }
   },

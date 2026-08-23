@@ -10,6 +10,9 @@ export const LISTEN_KEY = {
   GAMEPAD_CHANGED: 'gamepad-changed',
   START_MOTION: 'start-motion',
   SET_EXPRESSION: 'set-expression',
+  CHAT_STATUS: 'chat-status',
+  CAT_BUBBLE_CONTENT: 'cat-bubble-content',
+  CAT_INTERACTION: 'cat-interaction',
 }
 
 export const INVOKE_KEY = {
@@ -31,4 +34,5 @@ export const WINDOW_LABEL = {
   MAIN: 'main',
   PREFERENCE: 'preference',
   CHAT: 'chat',
+  BUBBLE: 'bubble',
 } as const

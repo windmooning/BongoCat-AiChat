@@ -5,6 +5,8 @@ const COMMANDS: &[&str] = &[
     "hide_chat_window",
     "toggle_chat_window",
     "reposition_chat_window",
+    "show_cat_bubble_window_command",
+    "hide_cat_bubble_window",
     "set_always_on_top",
     "set_taskbar_visibility",
 ];

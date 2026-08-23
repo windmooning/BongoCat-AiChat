@@ -51,6 +51,24 @@
         "resizable": false,
         "maximizable": false,
         "minimizable": false
+      },
+      {
+        "label": "bubble",
+        "title": "BongoCat Bubble",
+        "url": "index.html/#/bubble",
+        "width": 240,
+        "height": 108,
+        "minWidth": 180,
+        "minHeight": 72,
+        "visible": false,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "transparent": true,
+        "decorations": false,
+        "skipTaskbar": true,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false
       }
     ],
     "security": {

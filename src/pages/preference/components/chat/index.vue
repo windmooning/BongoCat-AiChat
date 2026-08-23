@@ -189,6 +189,18 @@ function handleResetAppearance() {
 
   <ProList :title="$t('pages.preference.chat.labels.personaSettings')">
     <ProListItem
+      :description="$t('pages.preference.chat.hints.catName')"
+      :title="$t('pages.preference.chat.labels.catName')"
+    >
+      <Input
+        v-model:value="chatStore.config.catName"
+        class="w-40"
+        :maxlength="20"
+        :placeholder="$t('pages.preference.chat.placeholders.catName')"
+      />
+    </ProListItem>
+
+    <ProListItem
       :description="$t('pages.preference.chat.hints.personaPreset')"
       :title="$t('pages.preference.chat.labels.personaPreset')"
     >

@@ -6,8 +6,10 @@ use tauri::{
 pub static MAIN_WINDOW_LABEL: &str = "main";
 pub static PREFERENCE_WINDOW_LABEL: &str = "preference";
 pub static CHAT_WINDOW_LABEL: &str = "chat";
+pub static CAT_BUBBLE_WINDOW_LABEL: &str = "bubble";
 
 const CHAT_GAP: i32 = 12;
+const CAT_BUBBLE_GAP: i32 = 8;
 
 #[cfg(target_os = "macos")]
 mod macos;
@@ -148,6 +150,73 @@ pub async fn reposition_chat_window<R: Runtime>(app_handle: AppHandle<R>) -> Res
     }
 
     let _ = chat_window.set_position(get_chat_position(&main_window, &chat_window));
+
+    Ok(())
+}
+
+fn get_cat_bubble_position<R: Runtime>(
+    main_window: &WebviewWindow<R>,
+    bubble_window: &WebviewWindow<R>,
+) -> PhysicalPosition<i32> {
+    let main_position = main_window.outer_position().unwrap_or_default();
+    let main_size = main_window.outer_size().unwrap_or_default();
+    let bubble_size = bubble_window.outer_size().unwrap_or_default();
+
+    let scale_factor = main_window.scale_factor().unwrap_or(1.0);
+    let gap = (f64::from(CAT_BUBBLE_GAP) * scale_factor) as i32;
+
+    let mut x = main_position.x + (main_size.width as i32 - bubble_size.width as i32) / 2;
+    let mut y = main_position.y - bubble_size.height as i32 - gap;
+
+    if let Some(monitor) = main_window.current_monitor().ok().flatten() {
+        let monitor_position = monitor.position();
+        let monitor_size = monitor.size();
+
+        let min_x = monitor_position.x;
+        let max_x = min_x + (monitor_size.width as i32 - bubble_size.width as i32).max(0);
+
+        x = x.clamp(min_x, max_x);
+
+        let min_y = monitor_position.y;
+        let max_y = min_y + (monitor_size.height as i32 - bubble_size.height as i32).max(0);
+
+        if y < min_y {
+            y = main_position.y + main_size.height as i32 + gap;
+        }
+
+        y = y.clamp(min_y, max_y);
+    }
+
+    PhysicalPosition::new(x, y)
+}
+
+#[command]
+pub async fn show_cat_bubble_window_command<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> Result<(), String> {
+    let main_window = app_handle
+        .get_webview_window(MAIN_WINDOW_LABEL)
+        .ok_or_else(|| "Main window is not available".to_string())?;
+    let bubble_window = app_handle
+        .get_webview_window(CAT_BUBBLE_WINDOW_LABEL)
+        .ok_or_else(|| "Cat bubble window is not available".to_string())?;
+
+    let position = get_cat_bubble_position(&main_window, &bubble_window);
+
+    let _ = bubble_window.set_always_on_top(true);
+    let _ = bubble_window.set_position(position);
+    let _ = bubble_window.show();
+
+    Ok(())
+}
+
+#[command]
+pub async fn hide_cat_bubble_window<R: Runtime>(app_handle: AppHandle<R>) -> Result<(), String> {
+    let bubble_window = app_handle
+        .get_webview_window(CAT_BUBBLE_WINDOW_LABEL)
+        .ok_or_else(|| "Cat bubble window is not available".to_string())?;
+
+    let _ = bubble_window.hide();
 
     Ok(())
 }

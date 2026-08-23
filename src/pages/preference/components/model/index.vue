@@ -4,7 +4,7 @@ import { remove } from '@tauri-apps/plugin-fs'
 import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useElementSize } from '@vueuse/core'
 import { Card, Masonry, message, Popconfirm } from 'antdv-next'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { Model } from '@/stores/model'
@@ -21,8 +21,10 @@ const catStore = useCatStore()
 const modelStore = useModelStore()
 const firstCardRef = useTemplateRef('firstCard')
 const { height } = useElementSize(firstCardRef)
+const coverFailed = reactive<Record<string, boolean>>({})
 const { t } = useI18n()
 const openBehaviorModal = ref(false)
+const cardHeight = computed(() => height.value ?? 220)
 
 const masonryItems = computed(() => {
   const items = modelStore.models.map((item) => {
@@ -34,6 +36,16 @@ const masonryItems = computed(() => {
 
   return [{ key: 'upload', data: null }, ...items]
 })
+
+function getCoverSrc(model: Model) {
+  if (coverFailed[model.id]) return '/logo.png'
+
+  return convertFileSrc(join(model.path, 'resources', 'cover.png'))
+}
+
+function handleCoverError(model: Model) {
+  coverFailed[model.id] = true
+}
 
 function handleToggle(nextModel: Model) {
   if (modelStore.currentModel?.id === nextModel.id) return
@@ -70,7 +82,7 @@ async function handleDelete(item: Model) {
   >
     <template #itemRender="{ data, index }">
       <template v-if="!data">
-        <Upload :style="{ height: `${height}px` }" />
+        <Upload :style="{ height: `${cardHeight}px` }" />
       </template>
 
       <Card
@@ -86,7 +98,8 @@ async function handleDelete(item: Model) {
         <template #cover>
           <img
             alt="example"
-            :src="convertFileSrc(join(data.path, 'resources', 'cover.png'))"
+            :src="getCoverSrc(data)"
+            @error="handleCoverError(data)"
           >
         </template>
 

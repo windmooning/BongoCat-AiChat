@@ -13,6 +13,9 @@ export const LISTEN_KEY = {
   CHAT_STATUS: 'chat-status',
   CAT_BUBBLE_CONTENT: 'cat-bubble-content',
   CAT_INTERACTION: 'cat-interaction',
+  CAT_USER_MESSAGE: 'cat-user-message',
+  CAT_REPLY_EVENT: 'cat-reply-event',
+  CAT_BUBBLE_MOOD: 'cat-bubble-mood',
 }
 
 export const INVOKE_KEY = {

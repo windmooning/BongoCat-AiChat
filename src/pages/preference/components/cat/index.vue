@@ -64,6 +64,13 @@ const catStore = useCatStore()
     </ProListItem>
 
     <ProListItem
+      :description="$t('pages.preference.cat.hints.autoBehavior')"
+      :title="$t('pages.preference.cat.labels.autoBehavior')"
+    >
+      <Switch v-model:checked="catStore.model.autoBehavior" />
+    </ProListItem>
+
+    <ProListItem
       v-if="isWindows"
       :description="$t('pages.preference.cat.hints.autoReleaseDelay')"
       :title="$t('pages.preference.cat.labels.autoReleaseDelay')"
@@ -115,6 +122,7 @@ const catStore = useCatStore()
           v-model:value="catStore.bubble.appearance.backgroundColor"
           :disabled-alpha="true"
           format="hex"
+          value-format="hex"
         />
 
         <Input

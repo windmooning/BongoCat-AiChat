@@ -153,10 +153,16 @@ export function useCatBubble() {
 
     bubbleVisible.value = false
     bubbleKind.value = undefined
+    emit(LISTEN_KEY.CAT_BUBBLE_MOOD, { kind: 'normal' })
     hideCatBubbleWindow()
   }
 
-  function showBubble(kind: 'hover' | 'proactive', mood: string, hint?: string) {
+  function showBubble(
+    kind: 'hover' | 'proactive',
+    mood: string,
+    hint?: string,
+    moodKind?: 'hover' | 'bored' | 'sleepy',
+  ) {
     if (!canShowBubbles.value) return
 
     bubbleKind.value = kind
@@ -167,6 +173,10 @@ export function useCatBubble() {
       mood,
       hint,
     })
+
+    if (moodKind) {
+      emit(LISTEN_KEY.CAT_BUBBLE_MOOD, { kind: moodKind })
+    }
 
     showCatBubbleWindow()
   }
@@ -230,7 +240,7 @@ export function useCatBubble() {
         hoverTimer = setTimeout(() => {
           const content = getHoverContent()
 
-          showBubble('hover', content.mood, content.hint)
+          showBubble('hover', content.mood, content.hint, 'hover')
         }, catStore.window.hoverBubbleDelay)
       }
 
@@ -274,7 +284,7 @@ export function useCatBubble() {
     if (!phraseCategory) return
 
     proactiveShown.value = true
-    showBubble('proactive', resolvePhrase(phraseCategory))
+    showBubble('proactive', resolvePhrase(phraseCategory), undefined, phraseCategory)
   }
 
   function markInteraction() {

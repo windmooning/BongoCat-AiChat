@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
+function normalizeHexColor(value: unknown, fallback: string) {
+  if (typeof value !== 'string') return fallback
+
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)
+    ? value
+    : fallback
+}
+
 export interface CatStore {
   model: {
     mirror: boolean
@@ -10,6 +18,7 @@ export interface CatStore {
     autoReleaseDelay: number
     maxFPS: number
     ignoreMouse: boolean
+    autoBehavior: boolean
   }
   window: {
     visible: boolean
@@ -75,6 +84,7 @@ export const useCatStore = defineStore('cat', () => {
     autoReleaseDelay: 3,
     maxFPS: 60,
     ignoreMouse: false,
+    autoBehavior: true,
   })
 
   const window = reactive<CatStore['window']>({
@@ -113,6 +123,7 @@ export const useCatStore = defineStore('cat', () => {
     if (!migrated.value) {
       model.mirror = mirrorMode.value
       model.mouseMirror = mouseMirror.value
+      model.autoBehavior = true
 
       window.visible = true
       window.passThrough = penetrable.value
@@ -123,24 +134,27 @@ export const useCatStore = defineStore('cat', () => {
       migrated.value = true
     }
 
+    model.autoBehavior ??= true
     window.hoverBubbleDelay ??= 1500
 
-    bubble.appearance = {
-      width: bubble.appearance?.width ?? 240,
-      height: bubble.appearance?.height ?? 108,
-      backgroundColor: bubble.appearance?.backgroundColor ?? '#ffffff',
-      backgroundOpacity: bubble.appearance?.backgroundOpacity ?? 100,
-      fontSize: bubble.appearance?.fontSize ?? 13,
-      borderRadius: bubble.appearance?.borderRadius ?? 18,
-      shadow: bubble.appearance?.shadow ?? true,
-    }
+    if (bubble) {
+      bubble.appearance = {
+        width: bubble.appearance?.width ?? 240,
+        height: bubble.appearance?.height ?? 108,
+        backgroundColor: normalizeHexColor(bubble.appearance?.backgroundColor, '#ffffff'),
+        backgroundOpacity: bubble.appearance?.backgroundOpacity ?? 100,
+        fontSize: bubble.appearance?.fontSize ?? 13,
+        borderRadius: bubble.appearance?.borderRadius ?? 18,
+        shadow: bubble.appearance?.shadow ?? true,
+      }
 
-    bubble.customPhrases = {
-      idleMorning: bubble.customPhrases?.idleMorning ?? '',
-      idleAfternoon: bubble.customPhrases?.idleAfternoon ?? '',
-      idleNight: bubble.customPhrases?.idleNight ?? '',
-      bored: bubble.customPhrases?.bored ?? '',
-      sleepy: bubble.customPhrases?.sleepy ?? '',
+      bubble.customPhrases = {
+        idleMorning: bubble.customPhrases?.idleMorning ?? '',
+        idleAfternoon: bubble.customPhrases?.idleAfternoon ?? '',
+        idleNight: bubble.customPhrases?.idleNight ?? '',
+        bored: bubble.customPhrases?.bored ?? '',
+        sleepy: bubble.customPhrases?.sleepy ?? '',
+      }
     }
   }
 

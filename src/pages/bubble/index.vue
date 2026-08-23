@@ -27,7 +27,9 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-function hexToRgb(hex: string) {
+function hexToRgb(hex: unknown) {
+  if (typeof hex !== 'string') return [255, 255, 255]
+
   const normalized = hex.trim().replace('#', '')
   const shortHex = /^[0-9a-f]{3}$/i.test(normalized)
   const fullHex = /^[0-9a-f]{6}$/i.test(normalized)
@@ -147,8 +149,8 @@ function handleClick() {
         </div>
 
         <i
-          class="i-solar:paw-linear absolute right-2 top-2 text-4"
-          :style="{ color: isLightBackground ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)' }"
+          class="i-solar:paw-linear absolute bottom-1.5 right-2 text-5"
+          :style="{ color: '#f48fb1' }"
         />
       </div>
 

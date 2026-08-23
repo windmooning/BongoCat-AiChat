@@ -19,7 +19,24 @@ export interface ChatAppearance {
   height: number
   backgroundColor: string
   backgroundOpacity: number
+  backgroundImageId: string
   fontSize: number
+  messageBubbles: {
+    user: ChatBubbleStyle
+    assistant: ChatBubbleStyle
+  }
+}
+
+export interface ChatBubbleStyle {
+  backgroundColor: string
+  backgroundOpacity: number
+  textColor: string
+}
+
+export interface ChatBackgroundImage {
+  id: string
+  path: string
+  name: string
 }
 
 export interface ChatConfig {
@@ -59,7 +76,40 @@ const DEFAULT_APPEARANCE: ChatAppearance = {
   height: 420,
   backgroundColor: '#ffffff',
   backgroundOpacity: 100,
+  backgroundImageId: 'logo',
   fontSize: 14,
+  messageBubbles: {
+    user: {
+      backgroundColor: '#ffe3ec',
+      backgroundOpacity: 100,
+      textColor: '#c2185b',
+    },
+    assistant: {
+      backgroundColor: '#f0f0f0',
+      backgroundOpacity: 100,
+      textColor: '#333333',
+    },
+  },
+}
+
+function normalizeHexColor(value: unknown, fallback: string) {
+  if (typeof value !== 'string') return fallback
+
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)
+    ? value
+    : fallback
+}
+
+function normalizeBubbleStyle(value: ChatBubbleStyle | undefined, fallback: ChatBubbleStyle): ChatBubbleStyle {
+  const raw = value as unknown as Record<string, unknown> | undefined
+
+  return {
+    backgroundColor: normalizeHexColor(raw?.backgroundColor, fallback.backgroundColor),
+    backgroundOpacity: typeof raw?.backgroundOpacity === 'number'
+      ? raw.backgroundOpacity
+      : fallback.backgroundOpacity,
+    textColor: normalizeHexColor(raw?.textColor, fallback.textColor),
+  }
 }
 
 export const useChatStore = defineStore('chat', () => {
@@ -79,6 +129,7 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   const messages = ref<ChatMessage[]>([])
+  const backgroundImages = ref<ChatBackgroundImage[]>([])
 
   const isConfigured = () => {
     return Boolean(config.endpoint.trim() && config.model.trim())
@@ -116,9 +167,28 @@ export const useChatStore = defineStore('chat', () => {
   const init = () => {
     config.catName ||= '小猫'
 
+    config.appearance.backgroundColor = normalizeHexColor(
+      config.appearance.backgroundColor,
+      '#ffffff',
+    )
+
     config.appearance = {
       ...DEFAULT_APPEARANCE,
       ...config.appearance,
+      messageBubbles: {
+        user: normalizeBubbleStyle(
+          config.appearance?.messageBubbles?.user,
+          DEFAULT_APPEARANCE.messageBubbles.user,
+        ),
+        assistant: normalizeBubbleStyle(
+          config.appearance?.messageBubbles?.assistant,
+          DEFAULT_APPEARANCE.messageBubbles.assistant,
+        ),
+      },
+    }
+
+    if (!Array.isArray(backgroundImages.value)) {
+      backgroundImages.value = []
     }
   }
 
@@ -141,6 +211,7 @@ export const useChatStore = defineStore('chat', () => {
   return {
     config,
     messages,
+    backgroundImages,
     init,
     resetAppearance,
     isConfigured,

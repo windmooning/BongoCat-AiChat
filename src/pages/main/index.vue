@@ -10,9 +10,10 @@ import { exists, readDir } from '@tauri-apps/plugin-fs'
 import { useDebounceFn, useEventListener } from '@vueuse/core'
 import { round } from 'es-toolkit'
 import { nth } from 'es-toolkit/compat'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { useAppMenu } from '@/composables/useAppMenu'
+import { useCatBehavior } from '@/composables/useCatBehavior'
 import { useCatBubble } from '@/composables/useCatBubble'
 import { useDevice } from '@/composables/useDevice'
 import { useGamepad } from '@/composables/useGamepad'
@@ -47,6 +48,7 @@ const modelStore = useModelStore()
 const generalStore = useGeneralStore()
 const chatStore = useChatStore()
 const { markInteraction } = useCatBubble()
+const { handleChatOpened } = useCatBehavior()
 const resizing = ref(false)
 const backgroundImagePath = ref<string>()
 const { stickActive } = useGamepad()
@@ -56,6 +58,12 @@ let lastLeftDownTime = 0
 let lastLeftDownPosition = { x: 0, y: 0 }
 let lastLeftDownScreenPosition = { x: 0, y: 0 }
 let draggingStarted = false
+
+function scheduleModelLayoutSync() {
+  requestAnimationFrame(() => {
+    void handleResize()
+  })
+}
 
 onMounted(startListening)
 
@@ -114,6 +122,9 @@ watch(() => modelStore.currentModel, async (model) => {
   }
 
   modelStore.modelReady = true
+
+  await nextTick()
+  scheduleModelLayoutSync()
 }, { deep: true, immediate: true })
 
 watch([() => catStore.window.scale, modelSize], async ([scale, modelSize]) => {
@@ -121,12 +132,14 @@ watch([() => catStore.window.scale, modelSize], async ([scale, modelSize]) => {
 
   const { width, height } = modelSize
 
-  appWindow.setSize(
+  await appWindow.setSize(
     new PhysicalSize({
       width: Math.round(width * (scale / 100)),
       height: Math.round(height * (scale / 100)),
     }),
   )
+
+  scheduleModelLayoutSync()
 }, { immediate: true })
 
 watch([modelStore.pressedKeys, stickActive], ([keys, stickActive]) => {
@@ -195,7 +208,9 @@ async function handleDoubleClick() {
   if (catStore.window.passThrough) return
 
   try {
-    await toggleChatWindow(chatStore.config.appearance.followCat)
+    const opened = await toggleChatWindow(chatStore.config.appearance.followCat)
+
+    if (opened) handleChatOpened()
   } catch {
     // The chat window may not be ready yet, ignore double-clicks.
   }
@@ -270,7 +285,7 @@ function handleMouseMove(event: MouseEvent) {
   >
     <img
       v-if="backgroundImagePath"
-      class="object-cover"
+      class="object-contain"
       :src="backgroundImagePath"
     >
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { Flex, Spin } from 'antdv-next'
-import { computed, ref, watch } from 'vue'
+import { Button, Flex, Spin } from 'antdv-next'
+import { computed, onErrorCaptured, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import UpdateApp from '@/components/update-app/index.vue'
@@ -21,10 +21,19 @@ import Shortcut from './components/shortcut/index.vue'
 useTray()
 const appStore = useAppStore()
 const current = ref(0)
+const renderError = ref<string>()
 const { t } = useI18n()
 const generalStore = useGeneralStore()
 const modelStore = useModelStore()
 const appWindow = getCurrentWebviewWindow()
+
+onErrorCaptured((error, _instance, info) => {
+  renderError.value = error instanceof Error
+    ? `${error.message}\n${info}`
+    : String(error)
+
+  return false
+})
 
 watch(() => generalStore.appearance.language, () => {
   appWindow.setTitle(t('pages.preference.title'))
@@ -78,6 +87,28 @@ const menus = computed(() => [
     size="large"
     :spinning="!modelStore.modelReady"
   />
+
+  <div
+    v-if="renderError"
+    class="absolute inset-0 z-10 flex items-center justify-center bg-[--ant-color-bg-container] p-6"
+  >
+    <div class="max-w-[80%] text-center">
+      <div class="mb-4 text-4 font-medium">
+        {{ $t('pages.preference.renderError') }}
+      </div>
+
+      <pre class="mb-4 max-h-60 overflow-auto break-words text-left text-3 color-red-5">
+        {{ renderError }}
+      </pre>
+
+      <Button
+        type="primary"
+        @click="renderError = undefined"
+      >
+        {{ $t('pages.preference.buttons.retry') }}
+      </Button>
+    </div>
+  </div>
 
   <Flex class="h-screen">
     <div

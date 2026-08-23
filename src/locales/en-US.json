@@ -8,6 +8,10 @@
     },
     "preference": {
       "title": "Preferences",
+      "renderError": "Preferences failed to render",
+      "buttons": {
+        "retry": "Retry"
+      },
       "cat": {
         "title": "Cat",
         "labels": {
@@ -39,6 +43,7 @@
           "opacity": "Opacity",
           "motionSound": "Motion Sound",
           "behavior": "Motions and Expressions",
+          "autoBehavior": "Auto Motions and Expressions",
           "autoReleaseDelay": "Auto Release Delay",
           "hideOnHover": "Hide on Hover",
           "maxFPS": "Max Frame Rate"
@@ -56,6 +61,7 @@
           "customPhrases": "One phrase per line. Leave empty to use built-in phrases.",
           "motionSound": "When enabled, the model will play corresponding sound effects when performing actions (if they exist).",
           "behavior": "When enabled, motions and expressions can be configured and triggered.",
+          "autoBehavior": "Automatically trigger cat motions and expressions based on chat, hover, time, and error state.",
           "passThrough": "When enabled, clicks pass through the window without affecting it.",
           "alwaysOnTop": "When enabled, the window stays above all other windows.",
           "keepInScreen": "When enabled, the window automatically stays within the screen boundaries.",
@@ -174,9 +180,18 @@
           "chatWidth": "Bubble Width",
           "chatHeight": "Bubble Height",
           "backgroundColor": "Background Color",
+          "backgroundImage": "Background Image",
+          "uploadBackground": "Upload Background",
           "backgroundOpacity": "Background Opacity",
           "fontSize": "Text Size",
           "resetAppearance": "Reset Appearance",
+          "messageBubbleSettings": "Message Bubbles",
+          "userBubbleBackground": "User Bubble Background",
+          "userBubbleOpacity": "User Bubble Opacity",
+          "userBubbleTextColor": "User Bubble Text Color",
+          "assistantBubbleBackground": "Cat Bubble Background",
+          "assistantBubbleOpacity": "Cat Bubble Opacity",
+          "assistantBubbleTextColor": "Cat Bubble Text Color",
           "dataSettings": "Data Management",
           "clearHistory": "Clear Chat History"
         },
@@ -195,15 +210,23 @@
           "systemPrompt": "Defines the cat's personality, speaking style, and identity.",
           "followCat": "When enabled, the bubble stays next to the cat; when disabled, it uses your custom position.",
           "backgroundColor": "Accepts hex colors. White is the default.",
+          "backgroundImage": "Choose a built-in cat head or model cover, or upload your own chat background.",
+          "backgroundUploadSuccess": "Background image uploaded",
           "backgroundOpacity": "Only the background becomes transparent; text stays readable.",
           "fontSize": "Changes the text size in messages and the input box.",
+          "messageBubbleSettings": "Configure color, opacity, and text color for user and cat message bubbles separately.",
           "clearHistory": "This action cannot be undone.",
           "clearSuccess": "Chat history cleared"
         },
         "options": {
           "catgirl": "Cute Catgirl",
           "cat": "Normal Cat",
-          "custom": "Custom"
+          "custom": "Custom",
+          "logoBackground": "Cat Avatar",
+          "model_standard": "Standard Model",
+          "model_keyboard": "Keyboard Model",
+          "model_gamepad": "Gamepad Model",
+          "customBackground": "Custom Background"
         },
         "placeholders": {
           "endpoint": "https://api.openai.com/v1/chat/completions",

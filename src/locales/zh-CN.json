@@ -8,6 +8,10 @@
     },
     "preference": {
       "title": "偏好设置",
+      "renderError": "设置页渲染出错",
+      "buttons": {
+        "retry": "重试"
+      },
       "cat": {
         "title": "猫咪设置",
         "labels": {
@@ -39,6 +43,7 @@
           "opacity": "不透明度",
           "motionSound": "动作音效",
           "behavior": "动作与表情",
+          "autoBehavior": "自动动作与表情",
           "autoReleaseDelay": "按键自动释放延迟",
           "hideOnHover": "鼠标移入隐藏",
           "maxFPS": "最大帧率"
@@ -56,6 +61,7 @@
           "customPhrases": "每行一句，留空使用内置文案。",
           "motionSound": "启用后，模型执行动作时会播放对应音效（如果存在）。",
           "behavior": "启用后，可以配置和触发模型的动作与表情。",
+          "autoBehavior": "根据聊天、悬停、时间和错误状态自动触发猫咪动作与表情。",
           "passThrough": "启用后，窗口不影响对其他应用程序的操作。",
           "alwaysOnTop": "启用后，窗口始终显示在其他应用程序上方。",
           "keepInScreen": "启用后，窗口会自动调整位置，防止超出屏幕边界。",
@@ -174,9 +180,18 @@
           "chatWidth": "气泡宽度",
           "chatHeight": "气泡高度",
           "backgroundColor": "背景颜色",
+          "backgroundImage": "背景图片",
+          "uploadBackground": "上传背景",
           "backgroundOpacity": "背景不透明度",
           "fontSize": "文字大小",
           "resetAppearance": "恢复默认外观",
+          "messageBubbleSettings": "消息气泡",
+          "userBubbleBackground": "用户气泡背景色",
+          "userBubbleOpacity": "用户气泡不透明度",
+          "userBubbleTextColor": "用户气泡文字色",
+          "assistantBubbleBackground": "猫咪气泡背景色",
+          "assistantBubbleOpacity": "猫咪气泡不透明度",
+          "assistantBubbleTextColor": "猫咪气泡文字色",
           "dataSettings": "数据管理",
           "clearHistory": "清空对话历史"
         },
@@ -195,15 +210,23 @@
           "systemPrompt": "定义猫咪的性格、说话方式和身份设定。",
           "followCat": "开启后气泡会贴到猫咪旁边并跟随移动；关闭后使用你拖动的位置。",
           "backgroundColor": "支持十六进制颜色，默认是白色。",
+          "backgroundImage": "选择内置猫头/模型封面，或上传自己的图片作为聊天背景。",
+          "backgroundUploadSuccess": "背景图片上传成功",
           "backgroundOpacity": "只调整背景透明度，文字保持清晰。",
           "fontSize": "调整聊天消息和输入框的文字大小。",
+          "messageBubbleSettings": "分别设置用户和猫咪消息气泡的颜色、透明度和文字颜色。",
           "clearHistory": "删除后无法恢复。",
           "clearSuccess": "对话历史已清空"
         },
         "options": {
           "catgirl": "可爱猫娘",
           "cat": "普通猫咪",
-          "custom": "自定义"
+          "custom": "自定义",
+          "logoBackground": "猫咪头像",
+          "model_standard": "标准模型",
+          "model_keyboard": "键盘模型",
+          "model_gamepad": "手柄模型",
+          "customBackground": "自定义背景"
         },
         "placeholders": {
           "endpoint": "https://api.openai.com/v1/chat/completions",

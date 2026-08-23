@@ -7,6 +7,8 @@ import { Button, Input, Popconfirm } from 'antdv-next'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import type { ChatBubbleStyle } from '@/stores/chat'
+
 import { useChatStatus } from '@/composables/useChatStatus'
 import { LISTEN_KEY } from '@/constants'
 import { hideChatWindow } from '@/plugins/window'
@@ -42,7 +44,9 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-function hexToRgb(hex: string) {
+function hexToRgb(hex: unknown) {
+  if (typeof hex !== 'string') return [255, 255, 255]
+
   const normalized = hex.trim().replace('#', '')
   const shortHex = /^[0-9a-f]{3}$/i.test(normalized)
   const fullHex = /^[0-9a-f]{6}$/i.test(normalized)
@@ -91,6 +95,54 @@ const cardStyle = computed(() => {
   return {
     backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alpha})`,
   }
+})
+
+const backgroundImageSrc = computed(() => {
+  const imageId = chatStore.config.appearance.backgroundImageId
+
+  if (imageId === 'logo') return '/logo.png'
+
+  if (imageId.startsWith('model:')) {
+    const mode = imageId.slice('model:'.length)
+    const model = modelStore.models.find(item => item.mode === mode)
+
+    return model
+      ? convertFileSrc(join(model.path, 'resources', 'cover.png'))
+      : '/logo.png'
+  }
+
+  const customImage = chatStore.backgroundImages.find(item => item.id === imageId)
+
+  return customImage ? convertFileSrc(customImage.path) : '/logo.png'
+})
+
+const backgroundOverlayStyle = computed(() => ({
+  backgroundImage: `url("${backgroundImageSrc.value}")`,
+  backgroundSize: 'contain',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  opacity: clamp(chatStore.config.appearance.backgroundOpacity, 0, 100) / 100,
+}))
+
+function getBubbleStyle(style: ChatBubbleStyle) {
+  const [red, green, blue] = hexToRgb(style.backgroundColor)
+  const alpha = clamp(style.backgroundOpacity, 0, 100) / 100
+
+  return {
+    backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alpha})`,
+    color: style.textColor,
+    fontSize: 'var(--chat-font-size)',
+    paddingRight: '22px',
+    paddingBottom: '18px',
+  }
+}
+
+const userBubbleStyle = computed(() => {
+  return getBubbleStyle(chatStore.config.appearance.messageBubbles.user)
+})
+
+const assistantBubbleStyle = computed(() => {
+  return getBubbleStyle(chatStore.config.appearance.messageBubbles.assistant)
 })
 
 const isConfigured = computed(() => chatStore.isConfigured())
@@ -168,6 +220,8 @@ async function handleSend() {
   input.value = ''
   isStreaming.value = true
 
+  emit(LISTEN_KEY.CAT_USER_MESSAGE, { text })
+
   chatStore.pushMessage('user', text)
 
   const assistantMessage = chatStore.pushMessage('assistant', '')
@@ -180,6 +234,7 @@ async function handleSend() {
   abortController.value = controller
 
   let content = ''
+  let replyResult: 'success' | 'error' | 'stopped' = 'success'
 
   try {
     await streamChatCompletion(
@@ -203,10 +258,14 @@ async function handleSend() {
     }
   } catch (error) {
     if (error instanceof ChatApiError && error.kind === 'aborted') {
+      replyResult = 'stopped'
+
       content = content.trim()
         ? `${content}${content.endsWith('\n') ? '' : '\n'}${t('pages.chat.messages.stopped')}`
         : t('pages.chat.messages.stopped')
     } else {
+      replyResult = 'error'
+
       const message = error instanceof ChatApiError
         ? error.message
         : t('pages.chat.errors.unknown')
@@ -216,6 +275,8 @@ async function handleSend() {
         : message
     }
   } finally {
+    emit(LISTEN_KEY.CAT_REPLY_EVENT, { result: replyResult })
+
     chatStore.updateMessage(assistantMessage.id, content)
     streamingMessageId.value = undefined
     streamingContent.value = ''
@@ -304,10 +365,15 @@ onUnmounted(() => {
     :style="rootStyle"
   >
     <div
-      class="h-full flex flex-col overflow-hidden b-1 b-solid bg-elevated b-border-sec rounded-2xl shadow-lg"
+      class="relative h-full flex flex-col overflow-hidden b-1 b-solid bg-elevated b-border-sec rounded-2xl shadow-lg"
       :style="cardStyle"
     >
-      <div class="flex items-center justify-between gap-2 border-b border-solid px-3 py-1.5 b-border-sec">
+      <div
+        class="pointer-events-none absolute inset-0 z-0"
+        :style="backgroundOverlayStyle"
+      />
+
+      <div class="relative z-1 flex items-center justify-between gap-2 border-b border-solid px-3 py-1.5 b-border-sec">
         <div
           class="min-w-0 flex flex-1 cursor-move select-none items-center gap-2"
           @mousedown="handleDragStart"
@@ -363,7 +429,7 @@ onUnmounted(() => {
 
       <div
         ref="messagesRef"
-        class="flex-1 overflow-y-auto px-3 py-3"
+        class="relative z-1 flex-1 overflow-y-auto px-3 py-3"
       >
         <div
           v-if="displayMessages.length === 0"
@@ -399,17 +465,8 @@ onUnmounted(() => {
           >
 
           <div
-            class="max-w-[85%] break-words px-3 py-2 text-3.5 leading-6 rounded-xl"
-            :class="message.role === 'user'
-              ? 'bg-blue-5 color-white'
-              : 'bg-[--ant-color-fill-quaternary] color-text-primary'"
-            :style="message.role === 'user'
-              ? { fontSize: 'var(--chat-font-size)' }
-              : {
-                backgroundColor: isLightBackground ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.12)',
-                color: contentColor,
-                fontSize: 'var(--chat-font-size)',
-              }"
+            class="relative max-w-[85%] break-words px-3 py-2 leading-6 rounded-xl"
+            :style="message.role === 'user' ? userBubbleStyle : assistantBubbleStyle"
           >
             <span v-if="message.role === 'assistant' && isStreaming && !message.content">
               <i
@@ -424,18 +481,23 @@ onUnmounted(() => {
             >
               {{ message.content }}
             </span>
+
+            <i
+              class="i-solar:paw-linear absolute bottom-1 right-1.5 text-4"
+              :style="{ color: '#f48fb1' }"
+            />
           </div>
         </div>
       </div>
 
       <div
         v-if="errorText"
-        class="px-3 pb-1 text-3 color-red-5"
+        class="relative z-1 px-3 pb-1 text-3 color-red-5"
       >
         {{ errorText }}
       </div>
 
-      <div class="flex items-end gap-2 border-t border-solid p-2 b-border-sec">
+      <div class="relative z-1 flex items-end gap-2 border-t border-solid p-2 b-border-sec">
         <Input.TextArea
           v-model:value="input"
           :auto-size="{ minRows: 1, maxRows: 4 }"

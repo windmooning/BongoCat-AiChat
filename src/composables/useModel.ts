@@ -75,7 +75,11 @@ export function useModel() {
 
       const { width, height, motions, expressions } = await live2d.load(path)
 
-      const nextMotions = Object.entries(motions)
+      let nextMotions = Object.entries(motions)
+
+      if (nextMotions.some(([groupName]) => groupName === 'CAT_motion')) {
+        nextMotions = nextMotions.filter(([groupName]) => groupName !== 'CAT_motion_lock')
+      }
 
       modelSize.value = { width, height }
       modelStore.currentMotions = nextMotions

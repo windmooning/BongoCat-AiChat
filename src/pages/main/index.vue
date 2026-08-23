@@ -48,6 +48,10 @@ const backgroundImagePath = ref<string>()
 const { stickActive } = useGamepad()
 let unlistenMoved: (() => void) | undefined
 const debouncedRepositionChat = useDebounceFn(repositionChatWindow, 120)
+let lastLeftDownTime = 0
+let lastLeftDownPosition = { x: 0, y: 0 }
+let lastLeftDownScreenPosition = { x: 0, y: 0 }
+let draggingStarted = false
 
 onMounted(startListening)
 
@@ -158,8 +162,23 @@ useTauriListen<number>(LISTEN_KEY.SET_EXPRESSION, ({ payload }) => {
   live2d.setExpression(payload)
 })
 
-function handleMouseDown() {
-  appWindow.startDragging()
+function handleMouseDown(event: MouseEvent) {
+  if (event.button !== 0) return
+
+  const now = Date.now()
+  const distance = Math.abs(event.clientX - lastLeftDownPosition.x)
+    + Math.abs(event.clientY - lastLeftDownPosition.y)
+  const isDoubleClick = now - lastLeftDownTime <= 350 && distance <= 8
+
+  lastLeftDownTime = now
+  lastLeftDownPosition = { x: event.clientX, y: event.clientY }
+  lastLeftDownScreenPosition = { x: event.screenX, y: event.screenY }
+  draggingStarted = false
+
+  if (!isDoubleClick) return
+
+  lastLeftDownTime = 0
+  handleDoubleClick()
 }
 
 async function handleDoubleClick() {
@@ -170,6 +189,10 @@ async function handleDoubleClick() {
   } catch {
     // The chat window may not be ready yet, ignore double-clicks.
   }
+}
+
+function handleMouseUp() {
+  draggingStarted = false
 }
 
 async function handleContextmenu(event: MouseEvent) {
@@ -201,6 +224,16 @@ async function handleContextmenu(event: MouseEvent) {
 function handleMouseMove(event: MouseEvent) {
   const { buttons, shiftKey, movementX, movementY } = event
 
+  if (buttons === 1 && !draggingStarted) {
+    const dragDistance = Math.abs(event.screenX - lastLeftDownScreenPosition.x)
+      + Math.abs(event.screenY - lastLeftDownScreenPosition.y)
+
+    if (dragDistance > 3) {
+      draggingStarted = true
+      appWindow.startDragging()
+    }
+  }
+
   if (buttons !== 2 || !shiftKey) return
 
   const delta = (movementX + movementY) * 0.5
@@ -219,9 +252,9 @@ function handleMouseMove(event: MouseEvent) {
       borderRadius: `${catStore.window.radius}%`,
     }"
     @contextmenu="handleContextmenu"
-    @dblclick="handleDoubleClick"
     @mousedown="handleMouseDown"
     @mousemove="handleMouseMove"
+    @mouseup="handleMouseUp"
   >
     <img
       v-if="backgroundImagePath"

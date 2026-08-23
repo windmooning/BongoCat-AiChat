@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Input, InputNumber, message, Select, Slider, Switch } from 'antdv-next'
+import { Button, ColorPicker, Input, InputNumber, message, Select, Slider, Switch } from 'antdv-next'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -65,6 +65,10 @@ function handleClearHistory() {
 
 function handlePresetChange(value: unknown) {
   chatStore.applyPreset(value as PersonaPreset)
+}
+
+function handleResetAppearance() {
+  chatStore.resetAppearance()
 }
 </script>
 
@@ -206,6 +210,94 @@ function handlePresetChange(value: unknown) {
         :auto-size="{ minRows: 4, maxRows: 10 }"
         :placeholder="$t('pages.preference.chat.placeholders.systemPrompt')"
       />
+    </ProListItem>
+  </ProList>
+
+  <ProList :title="$t('pages.preference.chat.labels.appearanceSettings')">
+    <ProListItem
+      :description="$t('pages.preference.chat.hints.followCat')"
+      :title="$t('pages.preference.chat.labels.followCat')"
+    >
+      <Switch v-model:checked="chatStore.config.appearance.followCat" />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.chat.labels.chatWidth')">
+      <InputNumber
+        v-model:value="chatStore.config.appearance.width"
+        class="w-24"
+        :max="800"
+        :min="280"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.chat.labels.chatHeight')">
+      <InputNumber
+        v-model:value="chatStore.config.appearance.height"
+        class="w-24"
+        :max="900"
+        :min="320"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.chat.hints.backgroundColor')"
+      :title="$t('pages.preference.chat.labels.backgroundColor')"
+    >
+      <div class="flex items-center gap-3">
+        <ColorPicker
+          v-model:value="chatStore.config.appearance.backgroundColor"
+          :disabled-alpha="true"
+          format="hex"
+        />
+
+        <Input
+          v-model:value="chatStore.config.appearance.backgroundColor"
+          class="w-30"
+        />
+      </div>
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.chat.hints.backgroundOpacity')"
+      :title="$t('pages.preference.chat.labels.backgroundOpacity')"
+      vertical
+    >
+      <Slider
+        v-model:value="chatStore.config.appearance.backgroundOpacity"
+        class="m-0!"
+        :max="100"
+        :min="0"
+        :tooltip="{
+          formatter(value) {
+            return `${value}%`
+          },
+        }"
+      />
+    </ProListItem>
+
+    <ProListItem
+      :description="$t('pages.preference.chat.hints.fontSize')"
+      :title="$t('pages.preference.chat.labels.fontSize')"
+      vertical
+    >
+      <Slider
+        v-model:value="chatStore.config.appearance.fontSize"
+        class="m-0!"
+        :max="24"
+        :min="12"
+        :step="1"
+        :tooltip="{
+          formatter(value) {
+            return `${value}px`
+          },
+        }"
+      />
+    </ProListItem>
+
+    <ProListItem :title="$t('pages.preference.chat.labels.resetAppearance')">
+      <Button @click="handleResetAppearance">
+        {{ $t('pages.preference.chat.labels.resetAppearance') }}
+      </Button>
     </ProListItem>
   </ProList>
 

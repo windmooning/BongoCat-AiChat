@@ -80,13 +80,17 @@ fn get_chat_position<R: Runtime>(
     PhysicalPosition::new(x, y)
 }
 
-fn show_chat_window<R: Runtime>(app_handle: &AppHandle<R>) -> Option<()> {
+fn show_chat_window<R: Runtime>(app_handle: &AppHandle<R>, follow_cat: bool) -> Option<()> {
     let (main_window, chat_window) = get_chat_windows(app_handle)?;
 
-    let position = get_chat_position(&main_window, &chat_window);
-
     let _ = chat_window.set_always_on_top(true);
-    let _ = chat_window.set_position(position);
+
+    if follow_cat {
+        let position = get_chat_position(&main_window, &chat_window);
+
+        let _ = chat_window.set_position(position);
+    }
+
     let _ = chat_window.show();
     let _ = chat_window.set_focus();
 
@@ -94,8 +98,12 @@ fn show_chat_window<R: Runtime>(app_handle: &AppHandle<R>) -> Option<()> {
 }
 
 #[command]
-pub async fn show_chat_window_command<R: Runtime>(app_handle: AppHandle<R>) -> Result<(), String> {
-    show_chat_window(&app_handle).ok_or_else(|| "Chat window is not available".to_string())
+pub async fn show_chat_window_command<R: Runtime>(
+    app_handle: AppHandle<R>,
+    follow_cat: bool,
+) -> Result<(), String> {
+    show_chat_window(&app_handle, follow_cat)
+        .ok_or_else(|| "Chat window is not available".to_string())
 }
 
 #[command]
@@ -110,7 +118,10 @@ pub async fn hide_chat_window<R: Runtime>(app_handle: AppHandle<R>) -> Result<()
 }
 
 #[command]
-pub async fn toggle_chat_window<R: Runtime>(app_handle: AppHandle<R>) -> Result<bool, String> {
+pub async fn toggle_chat_window<R: Runtime>(
+    app_handle: AppHandle<R>,
+    follow_cat: bool,
+) -> Result<bool, String> {
     let chat_window = app_handle
         .get_webview_window(CHAT_WINDOW_LABEL)
         .ok_or_else(|| "Chat window is not available".to_string())?;
@@ -120,7 +131,7 @@ pub async fn toggle_chat_window<R: Runtime>(app_handle: AppHandle<R>) -> Result<
 
         Ok(false)
     } else {
-        show_chat_window(&app_handle)
+        show_chat_window(&app_handle, follow_cat)
             .ok_or_else(|| "Chat window is not available".to_string())?;
 
         Ok(true)

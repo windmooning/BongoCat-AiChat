@@ -35,16 +35,16 @@ export function hideWindow(label?: WindowLabel) {
   }
 }
 
-export function showChatWindow() {
-  invoke(COMMAND.SHOW_CHAT_WINDOW)
+export function showChatWindow(followCat = true) {
+  invoke(COMMAND.SHOW_CHAT_WINDOW, { followCat })
 }
 
 export function hideChatWindow() {
   invoke(COMMAND.HIDE_CHAT_WINDOW)
 }
 
-export async function toggleChatWindow() {
-  return invoke<boolean>(COMMAND.TOGGLE_CHAT_WINDOW)
+export async function toggleChatWindow(followCat = true) {
+  return invoke<boolean>(COMMAND.TOGGLE_CHAT_WINDOW, { followCat })
 }
 
 export function repositionChatWindow() {

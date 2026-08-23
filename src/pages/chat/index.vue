@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { LogicalSize } from '@tauri-apps/api/dpi'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { Button, Input, Popconfirm } from 'antdv-next'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { WINDOW_LABEL } from '@/constants'
@@ -20,6 +21,70 @@ const streamingContent = ref('')
 const streamingMessageId = ref<string>()
 const abortController = ref<AbortController>()
 const messagesRef = ref<HTMLElement>()
+let draggingChatWindow = false
+let unlistenMoved: (() => void) | undefined
+
+const CHAT_SIZE_LIMITS = {
+  minWidth: 280,
+  maxWidth: 800,
+  minHeight: 320,
+  maxHeight: 900,
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function hexToRgb(hex: string) {
+  const normalized = hex.trim().replace('#', '')
+  const shortHex = /^[0-9a-f]{3}$/i.test(normalized)
+  const fullHex = /^[0-9a-f]{6}$/i.test(normalized)
+
+  if (!shortHex && !fullHex) return [255, 255, 255]
+
+  const value = shortHex
+    ? normalized.split('').map(char => `${char}${char}`).join('')
+    : normalized
+
+  return [
+    Number.parseInt(value.slice(0, 2), 16),
+    Number.parseInt(value.slice(2, 4), 16),
+    Number.parseInt(value.slice(4, 6), 16),
+  ]
+}
+
+function getLuminance(hex: string) {
+  const [red, green, blue] = hexToRgb(hex).map((channel) => {
+    const value = channel / 255
+
+    return value <= 0.03928
+      ? value / 12.92
+      : ((value + 0.055) / 1.055) ** 2.4
+  })
+
+  return 0.2126 * red! + 0.7152 * green! + 0.0722 * blue!
+}
+
+const isLightBackground = computed(() => {
+  return getLuminance(chatStore.config.appearance.backgroundColor) > 0.6
+})
+
+const contentColor = computed(() => {
+  return isLightBackground.value ? '#1f1f1f' : '#f5f5f5'
+})
+
+const rootStyle = computed<Record<string, string>>(() => ({
+  '--chat-font-size': `${chatStore.config.appearance.fontSize}px`,
+}))
+
+const cardStyle = computed(() => {
+  const [red, green, blue] = hexToRgb(chatStore.config.appearance.backgroundColor)
+  const alpha = clamp(chatStore.config.appearance.backgroundOpacity, 0, 100) / 100
+
+  return {
+    backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alpha})`,
+  }
+})
 
 const isConfigured = computed(() => chatStore.isConfigured())
 
@@ -145,6 +210,33 @@ function handleClearHistory() {
   scrollToBottom()
 }
 
+function handleDragStart(event: MouseEvent) {
+  if (event.button !== 0) return
+
+  draggingChatWindow = true
+  appWindow.startDragging()
+}
+
+function handleDragEnd() {
+  setTimeout(() => {
+    draggingChatWindow = false
+  }, 200)
+}
+
+watch(
+  [
+    () => chatStore.config.appearance.width,
+    () => chatStore.config.appearance.height,
+  ],
+  async ([width, height]) => {
+    const nextWidth = clamp(width, CHAT_SIZE_LIMITS.minWidth, CHAT_SIZE_LIMITS.maxWidth)
+    const nextHeight = clamp(height, CHAT_SIZE_LIMITS.minHeight, CHAT_SIZE_LIMITS.maxHeight)
+
+    await appWindow.setSize(new LogicalSize(nextWidth, nextHeight))
+  },
+  { immediate: true },
+)
+
 watch(
   () => [
     chatStore.messages.length,
@@ -157,6 +249,15 @@ watch(
 onMounted(() => {
   scrollToBottom()
 
+  appWindow.onMoved(() => {
+    if (!draggingChatWindow) return
+
+    draggingChatWindow = false
+    chatStore.config.appearance.followCat = false
+  }).then((unlisten) => {
+    unlistenMoved = unlisten
+  })
+
   appWindow.onFocusChanged(({ payload }) => {
     if (!payload) return
 
@@ -165,21 +266,38 @@ onMounted(() => {
     })
   })
 })
+
+onUnmounted(() => {
+  unlistenMoved?.()
+})
 </script>
 
 <template>
-  <div class="size-screen overflow-hidden p-2">
+  <div
+    class="size-screen overflow-hidden p-2"
+    :style="rootStyle"
+  >
     <div
       class="h-full flex flex-col overflow-hidden b-1 b-solid bg-elevated b-border-sec rounded-2xl shadow-lg"
+      :style="cardStyle"
     >
       <div class="flex items-center justify-between border-b border-solid px-3 py-2 b-border-sec">
-        <div class="flex items-center gap-2">
+        <div
+          class="flex cursor-move select-none items-center gap-2"
+          @mousedown="handleDragStart"
+          @mouseup="handleDragEnd"
+        >
           <img
             class="size-7 rounded-full"
             src="/logo.png"
           >
 
-          <span class="font-medium">{{ $t('pages.chat.title') }}</span>
+          <span
+            class="font-medium"
+            :style="{ color: contentColor }"
+          >
+            {{ $t('pages.chat.title') }}
+          </span>
         </div>
 
         <div class="flex items-center gap-1">
@@ -214,6 +332,7 @@ onMounted(() => {
         <div
           v-if="displayMessages.length === 0"
           class="h-full flex flex-col items-center justify-center gap-3 text-center color-text-tertiary"
+          :style="{ color: contentColor, fontSize: 'var(--chat-font-size)' }"
         >
           <img
             class="size-14 opacity-60 rounded-full"
@@ -245,6 +364,13 @@ onMounted(() => {
             :class="message.role === 'user'
               ? 'bg-blue-5 color-white'
               : 'bg-[--ant-color-fill-quaternary] color-text-primary'"
+            :style="message.role === 'user'
+              ? { fontSize: 'var(--chat-font-size)' }
+              : {
+                backgroundColor: isLightBackground ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.12)',
+                color: contentColor,
+                fontSize: 'var(--chat-font-size)',
+              }"
           >
             <span v-if="message.role === 'assistant' && isStreaming && !message.content">
               <i
@@ -276,6 +402,7 @@ onMounted(() => {
           :auto-size="{ minRows: 1, maxRows: 4 }"
           :disabled="isStreaming"
           :placeholder="$t('pages.chat.labels.inputPlaceholder')"
+          :style="{ color: contentColor, fontSize: 'var(--chat-font-size)' }"
           @keydown.enter.exact.prevent="handleSend"
         />
 

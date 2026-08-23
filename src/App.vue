@@ -44,6 +44,7 @@ onMounted(async () => {
   await generalStore.$tauri.start()
   await generalStore.init()
   await chatStore.$tauri.start()
+  chatStore.init()
   await shortcutStore.$tauri.start()
   await restoreState()
 })

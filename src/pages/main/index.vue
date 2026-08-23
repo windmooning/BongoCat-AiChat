@@ -28,6 +28,7 @@ import {
   toggleChatWindow,
 } from '@/plugins/window'
 import { useCatStore } from '@/stores/cat'
+import { useChatStore } from '@/stores/chat'
 import { useGeneralStore } from '@/stores/general.ts'
 import { useModelStore } from '@/stores/model'
 import { isImage } from '@/utils/is'
@@ -43,6 +44,7 @@ const catStore = useCatStore()
 const { getBaseMenu, getExitMenu } = useAppMenu()
 const modelStore = useModelStore()
 const generalStore = useGeneralStore()
+const chatStore = useChatStore()
 const resizing = ref(false)
 const backgroundImagePath = ref<string>()
 const { stickActive } = useGamepad()
@@ -56,7 +58,11 @@ let draggingStarted = false
 onMounted(startListening)
 
 onMounted(async () => {
-  unlistenMoved = await appWindow.onMoved(debouncedRepositionChat)
+  unlistenMoved = await appWindow.onMoved(() => {
+    if (chatStore.config.appearance.followCat) {
+      debouncedRepositionChat()
+    }
+  })
 })
 
 onUnmounted(handleDestroy)
@@ -185,7 +191,7 @@ async function handleDoubleClick() {
   if (catStore.window.passThrough) return
 
   try {
-    await toggleChatWindow()
+    await toggleChatWindow(chatStore.config.appearance.followCat)
   } catch {
     // The chat window may not be ready yet, ignore double-clicks.
   }

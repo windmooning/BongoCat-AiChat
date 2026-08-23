@@ -13,6 +13,15 @@ export interface ChatMessage {
 
 export type PersonaPreset = 'catgirl' | 'cat' | 'custom'
 
+export interface ChatAppearance {
+  followCat: boolean
+  width: number
+  height: number
+  backgroundColor: string
+  backgroundOpacity: number
+  fontSize: number
+}
+
 export interface ChatConfig {
   enabled: boolean
   endpoint: string
@@ -24,6 +33,7 @@ export interface ChatConfig {
   personaPreset: PersonaPreset
   systemPrompt: string
   replySuffix: string
+  appearance: ChatAppearance
 }
 
 export const PERSONA_PRESETS: Record<Exclude<PersonaPreset, 'custom'>, {
@@ -42,6 +52,15 @@ export const PERSONA_PRESETS: Record<Exclude<PersonaPreset, 'custom'>, {
 
 const MAX_STORED_MESSAGES = 200
 
+const DEFAULT_APPEARANCE: ChatAppearance = {
+  followCat: true,
+  width: 360,
+  height: 420,
+  backgroundColor: '#ffffff',
+  backgroundOpacity: 100,
+  fontSize: 14,
+}
+
 export const useChatStore = defineStore('chat', () => {
   const config = reactive<ChatConfig>({
     enabled: true,
@@ -54,6 +73,7 @@ export const useChatStore = defineStore('chat', () => {
     personaPreset: 'catgirl',
     systemPrompt: PERSONA_PRESETS.catgirl.systemPrompt,
     replySuffix: PERSONA_PRESETS.catgirl.replySuffix,
+    appearance: { ...DEFAULT_APPEARANCE },
   })
 
   const messages = ref<ChatMessage[]>([])
@@ -91,6 +111,17 @@ export const useChatStore = defineStore('chat', () => {
     messages.value = []
   }
 
+  const init = () => {
+    config.appearance = {
+      ...DEFAULT_APPEARANCE,
+      ...config.appearance,
+    }
+  }
+
+  const resetAppearance = () => {
+    config.appearance = { ...DEFAULT_APPEARANCE }
+  }
+
   const applyPreset = (preset: PersonaPreset) => {
     config.personaPreset = preset
 
@@ -106,6 +137,8 @@ export const useChatStore = defineStore('chat', () => {
   return {
     config,
     messages,
+    init,
+    resetAppearance,
     isConfigured,
     pushMessage,
     updateMessage,

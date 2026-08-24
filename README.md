@@ -20,9 +20,13 @@
 
 
 ## 功能介绍
-新开的功能基本都支持自定义。会给你打招呼，会冒泡。你给她发生气了，会晴天霹雳；发抱抱、晚安等安慰话语会头顶出天使光环，晚上熬夜也会出光环，因为原地升天了。
+
+新开的功能基本都支持自定义。会给你打招呼，会冒泡。
+你给她发生气了，会晴天霹雳；
+发抱抱、晚安等安慰话语会头顶出天使光环，晚上熬夜也会出光环，因为原地升天了。
 你夸它厉害、真棒、cool等，会戴上墨镜叼根烟，很装很嚣张
 聊天框可以点击气泡或者左键双击猫咪唤醒或隐藏。平时就是一只猫在那同步敲键盘动鼠标。
+
 ### 桌宠互动
 
 - 跨平台支持 Windows、macOS、Linux(x11)。
@@ -78,12 +82,7 @@
 感谢大家为 BongoCat 做出的宝贵贡献！如果你也希望为 BongoCat 做出贡献，请查阅[贡献指南](.github/CONTRIBUTING.md)。
 
 
-## 历史星标
+## ⭐ 历史星标
 
-<a href="https://www.star-history.com/#ayangweb/BongoCat&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ayangweb/BongoCat&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ayangweb/BongoCat&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ayangweb/BongoCat&type=Date" />
- </picture>
-</a>
+[![Star History Chart](https://api.star-history.com/svg?repos=windmooning/BongoCat-AiChat&type=Date)](https://star-history.com/#windmooning/BongoCat-AiChat&Date)
+

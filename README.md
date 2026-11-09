@@ -70,12 +70,7 @@
 📦 [Awesome-BongoCat](https://github.com/ayangweb/Awesome-BongoCat)
 
 
-## 赞赏
 
-这是我在github上第一次上传的小玩意，我不知道这种方式是否合适，AyangWeb前辈放了一张，那我也跟一张吧。赞赏随缘，心意无价，谢谢你的支持让我回血
- ❤️本人也会持续开发更多新功能，敬请期待！PS:对于一名在校大学生来说，token实在太贵啦，Deepseek最近还涨价，求降价哇！[滑跪]
-
-<img width="603" height="603" alt="094f10daf06a263d2e68769642362cd8" src="https://github.com/user-attachments/assets/834c7603-2f21-4ece-9fa6-c28695ce1f23" />
 
 ## 贡献指南
 
